@@ -1,9 +1,7 @@
 from datetime import datetime
-from typing import List, Optional
+# from typing import List, Optional
 
 from pydantic import BaseModel
-
-from .models import Post
 
 
 class UserBase(BaseModel):
@@ -17,7 +15,7 @@ class UserCreate(UserBase):
 class User(UserBase):
     id: int
     is_active: bool
-    posts: List[Post] = []
+    # posts: List[Post] = []
 
     class Config:
         orm_mode = True
@@ -25,10 +23,9 @@ class User(UserBase):
 
 class PostBase(BaseModel):
     text: str
-    pub_date: datetime
 
 
-class PostCreate(BaseModel):
+class PostCreate(PostBase):
     pass
 
 
@@ -36,6 +33,56 @@ class Post(PostBase):
     id: int
     author_id: int
     group_id: int
+    pub_date: datetime
 
     class Config:
         orm_mode = True
+
+
+class GroupBase(BaseModel):
+    title: str
+
+
+class GroupCreate(GroupBase):
+    pass
+
+
+class Group(GroupBase):
+    id: int
+
+    class Config:
+        orm_mode = True
+
+
+class CommentBase(BaseModel):
+    text: str
+
+
+class CommentCreate(CommentBase):
+    pass
+
+
+class Comment(CommentBase):
+    id: int
+    author_id: int
+    created: datetime
+    post_id: int
+
+    class Config:
+        orm_mode = True
+
+
+class FollowBase(BaseModel):
+    user_id: int
+    following_id: int
+
+    class Config:
+        orm_mode = True
+
+
+class FollowCreate(FollowBase):
+    pass
+
+
+class Follow(FollowBase):
+    id: int

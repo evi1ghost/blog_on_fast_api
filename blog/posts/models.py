@@ -1,30 +1,18 @@
 import datetime as dt
-from sqlalchemy import Boolean, Column, ForeignKey, Integer, String, DateTime
+from sqlalchemy import Column, ForeignKey, Integer, String, DateTime
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql.schema import CheckConstraint, UniqueConstraint
 
-from .database import Base
-
-
-class User(Base):
-    __tablename__ = 'users'
-
-    id = Column(Integer, primary_key=True)
-    username = Column(String, unique=True, index=True)
-    hashed_password = Column(String)
-    is_active = Column(Boolean, default=True)
-
-    posts = relationship('Post', back_populates="author")
-
-    def __repr__(self):
-        return f'<User(username={self.username})>'
+from ..database import Base
+from ..users.models import User
+# Убрать последний?
 
 
 class Group(Base):
     __tablename___ = 'groups'
 
     id = Column(Integer, primary_key=True)
-    title = Column(String, index=True)
+    title = Column(String(200), index=True)
 
 
 class Post(Base):

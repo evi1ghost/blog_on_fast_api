@@ -4,6 +4,9 @@ from datetime import datetime
 from pydantic import BaseModel
 
 
+# !!! Добавить валидации !!!
+
+
 class PostBase(BaseModel):
     text: str
 

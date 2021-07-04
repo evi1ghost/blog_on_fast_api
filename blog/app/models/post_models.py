@@ -1,18 +1,19 @@
 import datetime as dt
 from sqlalchemy import Column, ForeignKey, Integer, String, DateTime
 from sqlalchemy.orm import relationship
+from sqlalchemy.schema import Table
 from sqlalchemy.sql.schema import CheckConstraint, UniqueConstraint
 
 from ..database import Base
-from ..users.models import User
-# Убрать последний?
 
 
 class Group(Base):
-    __tablename___ = 'groups'
+    __tablename__ = 'groups'
 
     id = Column(Integer, primary_key=True)
-    title = Column(String(200), index=True)
+    title = Column(String(50), index=True, nullable=False)
+
+    posts = relationship('Post', back_populates='group')
 
 
 class Post(Base):
@@ -47,19 +48,11 @@ class Comment(Base):
         return f'<Commens(post={self.post_id}), text={self.text[:20]}>'
 
 
-class Follow(Base):
-    __tablename__ = 'follows'
-    __table_args__ = (
-        CheckConstraint('user_id != following_id', name='user_is_not_author'),
-        UniqueConstraint('user_id', 'following_id', name='unique_follow'),
-    )
-
-    id = Column(Integer, primary_key=True)
-    user_id = Column('User', ForeignKey('user.id'))
-    following_id = Column('User', ForeignKey('user.id'))
-
-    user = relationship('User', back_populates='follower')
-    following = relationship('User', back_populates='following')
-
-    def __repr__(self):
-        return f'<Follow(user={self.user_id}), following={self.following_id}>'
+follow_table = Table(
+    'follows', Base.metadata,
+    Column('follows_id', Integer, primary_key=True),
+    Column('user_id', Integer, ForeignKey('user.id'), nullable=False),
+    Column('following_id', Integer, ForeignKey('user_id'), nullable=False),
+    UniqueConstraint('user_id', 'following_id', name='unoque_follow'),
+    CheckConstraint('user_id != following_id', name='user_is_not_author')
+)

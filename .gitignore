@@ -130,3 +130,5 @@ dmypy.json
 .pyre/
 
 .vscode/
+
+blog_app.db

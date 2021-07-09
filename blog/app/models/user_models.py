@@ -14,24 +14,30 @@ class User(Base):
     is_active = Column(Boolean, default=True)
 
     posts = relationship(
-        'Post', back_populates="author",
-        cascade="all, delete, delete-orphan"
+        'Post', back_populates='author',
+        cascade='all, delete, delete-orphan'
     )
     comments = relationship(
         'Comment', back_populates='author',
-        cascade="all, delete, delete-orphan"
+        cascade='all, delete, delete-orphan'
     )
     follower = relationship(
-        'Follow',
-        secondary=follow_table,
-        back_populates='user',
-        cascade="all, delete, delete-orphan"
+        'User', lambda: follow_table,
+        primaryjoin=lambda: User.id == follow_table.c.user_id,
+        secondaryjoin=lambda: User.id == follow_table.c.following_id,
+        back_populates='follower',
+        cascade='all, delete'
     )
     following = relationship(
-        'Follow',
-        secondary=follow_table,
+        'User', lambda: follow_table,
+        primaryjoin=lambda: User.id == follow_table.c.following_id,
+        secondaryjoin=lambda: User.id == follow_table.c.user_id,
         back_populates='following',
-        cascade="all, delete, delete-orphan"
+        cascade='all, delete'
+    )
+    group = relationship(
+        'Group', back_populates='author',
+        cascade='all, delete, delete-orphan'
     )
 
     def __repr__(self):

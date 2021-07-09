@@ -1,24 +1,21 @@
 from datetime import datetime
-# from typing import List, Optional
+from typing import Optional
 
 from pydantic import BaseModel
-
-
-# !!! Добавить валидации !!!
 
 
 class PostBase(BaseModel):
     text: str
 
 
-class PostCreate(PostBase):
-    pass
+class PostCreateOrUpdate(PostBase):
+    group_id: Optional[int] = None
 
 
 class Post(PostBase):
     id: int
     author_id: int
-    group_id: int
+    group_id: Optional[int] = None
     pub_date: datetime
 
     class Config:
@@ -29,12 +26,13 @@ class GroupBase(BaseModel):
     title: str
 
 
-class GroupCreate(GroupBase):
+class GroupCreateOrUpdate(GroupBase):
     pass
 
 
 class Group(GroupBase):
     id: int
+    author_id: int
 
     class Config:
         orm_mode = True
@@ -44,7 +42,7 @@ class CommentBase(BaseModel):
     text: str
 
 
-class CommentCreate(CommentBase):
+class CommentCreateOrUpdate(CommentBase):
     pass
 
 
@@ -59,16 +57,19 @@ class Comment(CommentBase):
 
 
 class FollowBase(BaseModel):
-    user_id: int
     following_id: int
-
-    class Config:
-        orm_mode = True
 
 
 class FollowCreate(FollowBase):
     pass
 
 
+# Добавить валидацию
+
+
 class Follow(FollowBase):
-    id: int
+    follows_id: int
+    user_id: int
+
+    class Config:
+        orm_mode = True

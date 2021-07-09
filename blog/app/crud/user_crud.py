@@ -7,7 +7,7 @@ from ..auth import (
     verify_password, get_password_hash, oauth2_scheme,
     SECRET_KEY, ALGORITHM
 )
-from ..database import SessionLocal
+from ..database import get_db
 from ..models import user_models as models
 from ..schemas import user_schemas as schemas
 from ..schemas.token_schemas import TokenData
@@ -38,11 +38,14 @@ def create_user(db: Session, user: schemas.UserCreate):
     )
     db.add(db_user)
     db.commit()
-    db.refresh(db.user)
+    db.refresh(db_user)
     return db_user
 
 
-async def get_current_user(token: str = Depends(oauth2_scheme)):
+async def get_current_user(
+    token: str = Depends(oauth2_scheme),
+    db: Session = Depends(get_db)
+):
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
@@ -56,7 +59,7 @@ async def get_current_user(token: str = Depends(oauth2_scheme)):
         token_data = TokenData(username=username)
     except JWTError:
         raise credentials_exception
-    user = get_user_by_username(SessionLocal, username=token_data.username)
+    user = get_user_by_username(db, username=token_data.username)
     if user is None:
         raise credentials_exception
     return user
@@ -65,6 +68,6 @@ async def get_current_user(token: str = Depends(oauth2_scheme)):
 async def get_current_active_user(
     current_user: schemas.User = Depends(get_current_user)
 ):
-    if current_user.disabled:
+    if not current_user.is_active:
         raise HTTPException(status_code=400, detail="Inactive user")
     return current_user

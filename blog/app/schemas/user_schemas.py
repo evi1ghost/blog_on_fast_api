@@ -14,7 +14,13 @@ class UserCreate(UserBase):
 class User(UserBase):
     id: int
     is_active: bool
-    # posts: List[Post] = []
+
+    class Config:
+        orm_mode = True
+
+
+class PostUser(UserBase):
+    username: str
 
     class Config:
         orm_mode = True

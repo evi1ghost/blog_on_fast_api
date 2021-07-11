@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
@@ -19,6 +19,7 @@ router = APIRouter(
 def read_following_list_for_current_user(
     skip: int = 0, limit: int = 10,
     db: Session = Depends(get_db),
+    search: Optional[str] = None,
     current_user: user_models.User = Depends(user_crud.get_current_active_user)
 ):
     return post_crud.get_following_list(db, current_user.id, skip, limit)
@@ -44,6 +45,21 @@ def create_follow(
     db: Session = Depends(get_db),
     current_user: user_models.User = Depends(user_crud.get_current_active_user)
 ):
+    db_follow = post_crud.get_follow_by_user_and_following_id(
+        db,
+        follow.dict()['following_id'],
+        current_user.id
+    )
+    if db_follow:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail='The follow already exists'
+        )
+    if follow.dict()['following_id'] == current_user.id:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail='Cannot follow yuorself'
+        )
     return post_crud.create_follow(db, follow, current_user.id)
 
 
@@ -58,9 +74,9 @@ def delete_follow(
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail='Follow not found'
         )
-    if follow.user != current_user:
+    if follow.user_id != current_user.id:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail='Permission denied'
         )
-    return post_crud.delete_follow(follow)
+    return post_crud.delete_follow(db, follow)

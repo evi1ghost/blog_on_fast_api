@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
@@ -18,9 +18,11 @@ router = APIRouter(
 
 @router.get('/', response_model=List[post_schemas.Post])
 def read_post_list(
-    skip: int = 0, limit: int = 10, db: Session = Depends(get_db)
+    skip: int = 0, limit: int = 10,
+    db: Session = Depends(get_db),
+    group: Optional[int] = None
 ):
-    return Post.get_list(db, skip, limit)
+    return Post.get_list(db, skip, limit, group)
 
 
 @router.get('/{post_id}', response_model=post_schemas.Post)
@@ -70,6 +72,7 @@ def delete_post(
         )
     if post.author != current_user:
         raise HTTPException(
-            status_code=403, detail='Post can be deleted only by author'
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail='Post can be deleted only by author'
         )
     return Post.delete(db, post)

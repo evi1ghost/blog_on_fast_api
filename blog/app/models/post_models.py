@@ -63,3 +63,6 @@ follow_table = Table(
 
 class Follow(Base):
     __table__ = follow_table
+
+    # follower = relationship('User', back_populates='follower')
+    # following = relationship('User', back_populates='following')

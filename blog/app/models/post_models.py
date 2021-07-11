@@ -11,7 +11,7 @@ class Group(Base):
     __tablename__ = 'groups'
 
     id = Column(Integer, primary_key=True)
-    author_id = Column('User', ForeignKey('users.id'))
+    author_id = Column('User', ForeignKey('users.id'), nullable=False)
     title = Column(String(50), index=True, nullable=False, unique=True)
 
     author = relationship('User', back_populates='group')
@@ -23,13 +23,15 @@ class Post(Base):
 
     id = Column(Integer, primary_key=True)
     text = Column(String, index=True, nullable=False)
-    author_id = Column('User', ForeignKey('users.id'))
+    author_id = Column('User', ForeignKey('users.id'), nullable=False)
     group_id = Column('Group', ForeignKey('groups.id'), nullable=True)
     pub_date = Column(DateTime, default=dt.datetime.now)
 
     author = relationship('User', back_populates='posts')
     group = relationship('Group', back_populates='posts')
-    comments = relationship('Comment', back_populates='post')
+    comments = relationship(
+        'Comment', back_populates='post', cascade='all, delete'
+    )
 
     def __repr__(self):
         return f'<Post(text={self.text[:20]})>'
@@ -63,6 +65,3 @@ follow_table = Table(
 
 class Follow(Base):
     __table__ = follow_table
-
-    # follower = relationship('User', back_populates='follower')
-    # following = relationship('User', back_populates='following')

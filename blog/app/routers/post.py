@@ -27,7 +27,7 @@ def read_post_list(
 
 @router.get('/{post_id}', response_model=post_schemas.Post)
 def read_single_post(post_id: int, db: Session = Depends(get_db)):
-    db_post = Post.get_singl(db, post_id)
+    db_post = Post.get_single(db, post_id)
     if db_post is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail='Post not found'
@@ -51,7 +51,7 @@ def update_post(
     db: Session = Depends(get_db),
     current_user: user_models.User = Depends(user_crud.get_current_active_user)
 ):
-    post = Post.get_singl(db, post_id)
+    post = Post.get_single(db, post_id)
     if post.author != current_user:
         raise HTTPException(
             status_code=403, detail='Post can be changed only by author'
@@ -65,7 +65,7 @@ def delete_post(
     db: Session = Depends(get_db),
     current_user: user_models.User = Depends(user_crud.get_current_active_user)
 ):
-    post = Post.get_singl(db, post_id)
+    post = Post.get_single(db, post_id)
     if post is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail='Post not found'

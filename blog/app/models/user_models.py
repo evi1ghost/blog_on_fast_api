@@ -15,11 +15,11 @@ class User(Base):
 
     posts = relationship(
         'Post', back_populates='author',
-        cascade='all, delete, delete-orphan'
+        cascade='all, delete'
     )
     comments = relationship(
         'Comment', back_populates='author',
-        cascade='all, delete, delete-orphan'
+        cascade='all, delete'
     )
     follower = relationship(
         'User', lambda: follow_table,
@@ -37,7 +37,7 @@ class User(Base):
     )
     group = relationship(
         'Group', back_populates='author',
-        cascade='all, delete, delete-orphan'
+        cascade='all, delete'
     )
 
     def __repr__(self):

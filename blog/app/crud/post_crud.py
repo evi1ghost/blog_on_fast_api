@@ -52,13 +52,13 @@ def get_follow_by_user_and_following_id(
         ).first()
 
 
-# def get_follow_by_usernames(
-#     db: Session, user_username: str, following_username: str
-# ):
+def get_single_follow(db: Session, id: int):
+    return db.query(models.Follow).filter(
+        models.Follow.follows_id == id).first()
 
 
-def create_follow(db: Session, follow: schemas.FollowCreate, user_id: int):
-    db_follow = models.Follow(**follow.dict(), user_id=user_id)
+def create_follow(db: Session, following_id: int, user_id: int):
+    db_follow = models.Follow(following_id=following_id, user_id=user_id)
     db.add(db_follow)
     db.commit()
     db.refresh(db_follow)

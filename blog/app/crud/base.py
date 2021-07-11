@@ -23,7 +23,7 @@ class PostCRUDBase(Generic[ModelType, SchemaType]):
                 self.model.post_id == post_id).offset(skip).limit(limit).all()
         return db.query(self.model).offset(skip).limit(limit).all()
 
-    def get_singl(self, db: Session, id: int, post_id: Optional[int] = None):
+    def get_single(self, db: Session, id: int, post_id: Optional[int] = None):
         if post_id:
             return db.query(self.model).filter(
                 self.model.id == id, self.model.post_id == post_id).first()

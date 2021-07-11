@@ -32,7 +32,7 @@ def read_single_comment(
     comment_id: int,
     db: Session = Depends(get_db)
 ):
-    comment = Comment.get_singl(db, comment_id, post_id)
+    comment = Comment.get_single(db, comment_id, post_id)
     if comment is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail='Comment not found'
@@ -61,7 +61,7 @@ def update_comment(
     db: Session = Depends(get_db),
     current_user: user_models.User = Depends(user_crud.get_current_active_user)
 ):
-    comment = Comment.get_singl(db, comment_id, post_id)
+    comment = Comment.get_single(db, comment_id, post_id)
     if comment is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail='Comment not found'
@@ -81,7 +81,7 @@ def delete_comment(
     db: Session = Depends(get_db),
     current_user: user_models.User = Depends(user_crud.get_current_active_user)
 ):
-    comment = Comment.get_singl(db, comment_id, post_id)
+    comment = Comment.get_single(db, comment_id, post_id)
     if comment is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail='Post not found'

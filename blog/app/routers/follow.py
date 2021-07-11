@@ -22,6 +22,11 @@ def read_following_list_for_current_user(
     search: Optional[str] = None,
     current_user: user_models.User = Depends(user_crud.get_current_active_user)
 ):
+    if search:
+        following_user = user_crud.get_user_by_username(db, search)
+        return [post_crud.get_follow_by_user_and_following_id(
+            db, following_user.id, current_user.id
+        )]
     return post_crud.get_following_list(db, current_user.id, skip, limit)
 
 
@@ -45,9 +50,12 @@ def create_follow(
     db: Session = Depends(get_db),
     current_user: user_models.User = Depends(user_crud.get_current_active_user)
 ):
+    following_user = user_crud.get_user_by_username(
+        db, follow.dict()['following_id']
+    )
     db_follow = post_crud.get_follow_by_user_and_following_id(
         db,
-        follow.dict()['following_id'],
+        following_user.id,
         current_user.id
     )
     if db_follow:
@@ -55,12 +63,12 @@ def create_follow(
             status_code=status.HTTP_403_FORBIDDEN,
             detail='The follow already exists'
         )
-    if follow.dict()['following_id'] == current_user.id:
+    if following_user == current_user:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail='Cannot follow yuorself'
         )
-    return post_crud.create_follow(db, follow, current_user.id)
+    return post_crud.create_follow(db, following_user.id, current_user.id)
 
 
 @router.delete('/{follow_id}/', status_code=204)

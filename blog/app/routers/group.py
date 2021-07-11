@@ -25,7 +25,7 @@ def read_group_list(
 
 @router.get('/{group_id}/', response_model=post_schemas.Group)
 def read_single_group(group_id: int, db: Session = Depends(get_db)):
-    group = Group.get_singl(db, group_id)
+    group = Group.get_single(db, group_id)
     if group is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail='Group not found'
@@ -49,7 +49,7 @@ def update_group(
     db: Session = Depends(get_db),
     current_user: user_models.User = Depends(user_crud.get_current_active_user)
 ):
-    group = Group.get_singl(db, group_id)
+    group = Group.get_single(db, group_id)
     if group is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail='Group not found'
@@ -68,7 +68,7 @@ def delete_group(
     db: Session = Depends(get_db),
     current_user: user_models.User = Depends(user_crud.get_current_active_user)
 ):
-    group = Group.get_singl(db, group_id)
+    group = Group.get_single(db, group_id)
     if group is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail='Group not found'

@@ -1,8 +1,10 @@
 from datetime import datetime
 from typing import Optional, Union
 
-from pydantic import BaseModel, validator, Field
+from pydantic import BaseModel, Field, validator
 
+from ..crud.user_crud import get_user
+from ..database import SessionLocal
 from .user_schemas import PostUser
 
 
@@ -17,7 +19,7 @@ class PostCreateOrUpdate(PostBase):
 
 class Post(PostBase):
     id: int
-    author: Union[str, PostUser] = Field(alias='author')
+    author: Union[str, PostUser]
     group_id: Optional[int] = None
     pub_date: datetime
 
@@ -40,7 +42,7 @@ class GroupCreateOrUpdate(GroupBase):
 
 class Group(GroupBase):
     id: int
-    author: Union[PostUser, str]
+    author: Union[str, PostUser]
 
     class Config:
         orm_mode = True
@@ -61,7 +63,7 @@ class CommentCreateOrUpdate(CommentBase):
 
 class Comment(CommentBase):
     id: int
-    author: Union[PostUser, str]
+    author: Union[str, PostUser]
     created: datetime
     post_id: int
 
@@ -75,16 +77,31 @@ class Comment(CommentBase):
 
 # Follow block
 class FollowBase(BaseModel):
-    following_id: int
-
-
-class FollowCreate(FollowBase):
     pass
 
 
+class FollowCreate(FollowBase):
+    following_id: str = Field(alias='following')
+
+    class Config:
+        allow_population_by_field_name = True
+
+
 class Follow(FollowBase):
-    follows_id: int
-    user_id: int
+    follows_id: int = Field(alias='id')
+    user_id: Union[str, int] = Field(alias='user')
+    following_id: Union[str, int] = Field(alias='following')
 
     class Config:
         orm_mode = True
+        allow_population_by_field_name = True
+
+    @validator('user_id', always=True, pre=True)
+    def validate_user_username(cls, v):
+        user = get_user(SessionLocal(), v)
+        return user.username
+
+    @validator('following_id', always=True, pre=True)
+    def validate_following_username(cls, v):
+        following = get_user(SessionLocal(), v)
+        return following.username

@@ -5,8 +5,8 @@ from sqlalchemy import pool
 
 from alembic import context
 
-from app.database import Base  # type: ignore
-from app.models import user_models, post_models  # type: ignore
+from blog.app.database import Base  # type: ignore
+from blog.app.models import user_models, post_models  # type: ignore
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.

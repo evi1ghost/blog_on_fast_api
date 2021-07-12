@@ -30,7 +30,7 @@ class Post(Base):
     author = relationship('User', back_populates='posts')
     group = relationship('Group', back_populates='posts')
     comments = relationship(
-        'Comment', back_populates='post', cascade='all, delete'
+        'Comment', back_populates='post'
     )
 
     def __repr__(self):
@@ -47,7 +47,7 @@ class Comment(Base):
     created = Column(DateTime, default=dt.datetime.now)
 
     author = relationship('User', back_populates='comments')
-    post = relationship('Post', back_populates='comments')
+    post = relationship('Post', back_populates='comments', cascade='all, delete')
 
     def __repr__(self):
         return f'<Commens(post={self.post_id}), text={self.text[:20]}>'
